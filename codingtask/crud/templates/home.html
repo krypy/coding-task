@@ -2,6 +2,38 @@
 
 {% block body%}
 <h1>Home.html</h1>
-<h2>Logged in</h2>
+
 <a href="{% url 'logout' %}">logout</a>
+<a href="{% url 'add' %}">Add Client</a>
+<h2>Clients</h2>
+<table>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>IBAN</th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.first_name }}</td>
+            <td>{{ client.last_name }}</td>
+            <td>{{ client.iban }}</td>
+            <td>
+                {% if client.created_by == user %}
+                <a href="{% url 'edit' client.pk %}">Edit</a>
+                <a href="{% url 'del'  client.pk %}">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+
+
+
 {% endblock %}

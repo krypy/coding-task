@@ -20,7 +20,10 @@ from crud import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('home', views.home, name='home'),
-     path('logout', views.logout, name='logout'),
+    path('client/list', views.home, name='home'),
+    path('client/add', views.add_client, name='add'),
+    path('client/edit/<int:client_id>', views.edit_client, name='edit'),
+    path('client/del/<int:client_id>', views.delete_client, name='del'),
+    path('logout', views.logout, name='logout'),
     path('', include('social_django.urls', namespace='social'))
 ]
