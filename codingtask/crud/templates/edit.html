@@ -1,11 +1,33 @@
 {% extends 'base.html' %}
-
+{% load material_form %} 
 {% block body%}
-<h1>{{ title }}</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ form }}
-    <button type="submit" >{{ submit }}</button>
-</form>
-
+<div class="container">
+    <div class="row">
+        <div class="col s12 m6 offset-m3">
+            <div class="card ">
+                <div class="card-content ">
+                    <div class="section">
+                        <span class="card-title">{{ title }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <form method="POST">
+                        <div class="section">
+                            {% csrf_token %}
+                            {% form form=form %}{% endform %}
+                        </div>
+                        <div class="divider"></div>
+                        <div class="section">
+                            <div class="row">
+                                <div class="col s12">
+                                    <a href="{% url 'home' %}" class="waves-effect waves-light btn gray" >Cancel</a>
+                                    <button type="submit" class="waves-effect waves-light btn blue right">{{ submit }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
