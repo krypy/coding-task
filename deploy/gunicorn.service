@@ -1,0 +1,21 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+PIDFile=/run/gunicorn/pid
+User=vagrant
+Group=vagrant
+RuntimeDirectory=gunicorn
+RuntimeDirectoryMode=0775
+
+WorkingDirectory=/home/vagrant/codingtask
+ExecStart=/usr/local/bin/gunicorn --pid /run/gunicorn/pid --bind unix:/run/gunicorn/socket codingtask.wsgi
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+PermissionsStartOnly=True
+
+[Install]
+WantedBy=multi-user.target

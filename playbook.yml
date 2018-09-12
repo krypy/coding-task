@@ -1,0 +1,98 @@
+- name: Deploy project
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: yes
+  become_user: root
+  become_method: sudo
+  gather_facts: no
+
+  tasks:
+    - name: Install required packages
+      apt:
+        update_cache: yes
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - python3-pip
+          - nginx
+
+    - name: Symlink python
+      file:
+        src: /usr/bin/python3
+        dest: /usr/bin/python
+        state: link
+        owner: root
+        group: root
+        
+    - name: Install python requirements
+      command: "pip3 install {{ item }}"
+      loop:
+        - django
+        - social-auth-app-django
+        - django-material
+        - gunicorn
+
+    - name: Copy nginx.conf
+      copy: 
+        src: deploy/nginx.conf
+        dest: /etc/nginx/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Copy gunicorn socket/service
+      copy: 
+        src: deploy/{{ item }}
+        dest: /etc/systemd/system/
+        owner: root
+        group: root
+        mode: 0644
+      loop: 
+        - gunicorn.socket
+        - gunicorn.service
+        
+    - name: Copy gunicorn.conf
+      copy: 
+        src: deploy/gunicorn.conf
+        dest: /etc/tmpfiles.d/
+        owner: root
+        group: root
+        mode: 0644
+         
+    - name: Copy project
+      copy: 
+        src: codingtask
+        dest: /home/vagrant/
+        owner: vagrant
+        group: vagrant
+    
+    - name: Make manage.py executable
+      file:
+        path: /home/vagrant/codingtask/manage.py
+        mode: 0755
+        
+    - name: Collect statics and Make migrations
+      command: "/home/vagrant/codingtask/manage.py {{ item }} --no-input"
+      become: true
+      become_user: vagrant
+      loop:
+        - collectstatic
+        - makemigrations
+        - migrate 
+        
+    - name: Enable Gunicorn 
+      systemd:
+        daemon_reload: yes
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - gunicorn.socket
+        - gunicorn.service
+
+    - name: Restart Nginx
+      systemd:
+        name: nginx
+        enabled: yes
+        state: restarted
