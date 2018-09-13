@@ -12,8 +12,8 @@
 ## How to run?
 
 ```bash
-    git clone
-    cd 
+    git clone https://github.com/krypy/coding-task.git
+    cd coding-task
     vagrant up
 
 ```
