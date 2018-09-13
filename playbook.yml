@@ -15,6 +15,9 @@
       vars:
         packages:
           - python3-pip
+          - postgresql
+          - postgresql-contrib
+          - libpq-dev
           - nginx
 
     - name: Symlink python
@@ -32,7 +35,29 @@
         - social-auth-app-django
         - django-material
         - gunicorn
+        - psycopg2-binary
 
+    - name: Enable passwordless sudo
+      lineinfile: 
+        dest: /etc/sudoers
+        regexp: '^vagrant'
+        line: 'vagrant ALL=(postgres) NOPASSWD:/bin/sh'
+
+    - name: Create a PostgreSQL database user
+      postgresql_user:
+        name: vagrant
+        password: vagrant-secret
+        role_attr_flags: CREATEDB
+        state: present
+      become: yes
+      become_user: postgres
+      
+    - name: Create a PostgreSQL database
+      postgresql_db:
+        name: coding_task
+      become: yes
+      become_user: postgres
+      
     - name: Copy nginx.conf
       copy: 
         src: deploy/nginx.conf
