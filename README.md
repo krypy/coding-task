@@ -1,6 +1,6 @@
 # Coding Task
 
-
+Example of usage of several technologies combined. 
 
 ## Requirements
 
